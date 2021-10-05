@@ -5,6 +5,8 @@ import octoprint.plugin
 import flask, json
 from octoprint.server.util.flask import restricted_access
 from octoprint.events import eventManager, Events
+import time
+
 from octoprint.access.permissions import Permissions,ADMIN_GROUP,USER_GROUP
 
 from .print_queue import PrintQueue, QueueItem
@@ -87,7 +89,7 @@ class ContinuousprintPlugin(
     def on_event(self, event, payload):
         if not hasattr(self, "d"): # Sometimes message arrive pre-init
             return
-        
+
         if event == Events.PRINT_DONE:
             self.d.on_print_success()
             self.paused = False
@@ -124,11 +126,24 @@ class ContinuousprintPlugin(
         self._msg("Print cancelled", type="error")
         self._printer.cancel_print()
 
+	def run_clear_bed(self):
+		self._logger.info("Clearing bed")
+		bed_clear_threshold = 25
+		# todo set the bed temp
+		self._printer.set_temperature("bed", bed_clear_threshold)
+		# wait until temp is low enough
+		bed_temp = self._printer.get_current_temperatures()['bed']
+		while bed_temp > bed_clear_threshold:
+			self._logger.info(f"Bed temp at {bed_temp} waiting for {bed_clear_threshold}")
+			time.sleep(5)
+			bed_temp = self._printer.get_current_temperatures()['bed']
+
+		bed_clearing_script = self._settings.get([CLEARING_SCRIPT_KEY]).split("\n")
+		self._printer.commands(bed_clearing_script, force=True)
+
     def start_print(self, item, clear_bed=True):
         if clear_bed:
-            self._logger.info("Clearing bed")
-            bed_clearing_script = self._settings.get([CLEARING_SCRIPT_KEY]).split("\n")
-            self._printer.commands(bed_clearing_script, force=True)
+            self.run_clear_Bed()
 
         self._msg("Starting print: " + item.name)
         self._msg(type="reload")
@@ -150,21 +165,21 @@ class ContinuousprintPlugin(
                 if i<len(q):# no deletion of last item
                     q[i]["changed"] = True
             q = json.dumps(q)
-    
+
         resp = ('{"active": %s, "status": "%s", "queue": %s}' % (
                 "true" if self.d.active else "false",
                 self.d.status,
                 q
             ))
         return resp
-            
+
     # Listen for resume from printer ("M118 //action:queuego"), only act if actually paused. #from @grtrenchman
     def resume_action_handler(self, comm, line, action, *args, **kwargs):
         if not action == "queuego":
             return
         if self.paused:
             self.d.set_active()
-        
+
     ##~~ APIs
     @octoprint.plugin.BlueprintPlugin.route("/state", methods=["GET"])
     @restricted_access
@@ -212,7 +227,7 @@ class ContinuousprintPlugin(
         count = int(flask.request.form["count"])
         self.q.remove(idx, count)
         return self.state_json(changed=[idx])
-        
+
     @octoprint.plugin.BlueprintPlugin.route("/set_active", methods=["POST"])
     @restricted_access
     def set_active(self):
