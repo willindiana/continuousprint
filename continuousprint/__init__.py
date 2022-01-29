@@ -66,7 +66,7 @@ class ContinuousprintPlugin(
         d[RESTART_ON_PAUSE_KEY] = False
         d[RESTART_MAX_TIME_KEY] = 60 * 60
         d["bed_cooldown_enabled"] = False
-        d["bed_cooldown_threshold"] = 20
+        d["bed_cooldown_threshold"] = 30
         d["bed_cooldown_timeout"] = 60
         return d
 
