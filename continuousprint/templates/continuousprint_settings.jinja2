@@ -3,10 +3,6 @@
 	<p>
 		When continually printing the bed needs to be cleared in order for the next print to work.
 	</p>
-	<p>
-		There is a special [PAUSE] command that doesn't get sent to the printer but instead indefinatly pauses the queue until the resume button is pressed.<br />
-		<small style="font-size: 0.8em"><b>Note:</b> this doesn't put the printer into a paused state it simply tells the queue to wait.</small>
-	</p>
 
     <h5>Bed Clearing Temperature Settings</h5>
     <p>
@@ -18,7 +14,7 @@
     <div class="control-group">
         <label class="control-label">Control Post Print Bed Temperature</label>
         <div class="controls">
-            <textarea rows="1" class="input-block-level" data-bind="value: settings.plugins.continuousprint.cp_bed_clearing_temp_threshold"></textarea>
+            <input type=checkbox data-bind="checked: settings.plugins.continuousprint.cp_bed_temp_ctrl_enabled">
         </div>
     </div>
 
@@ -38,6 +34,9 @@
     <p>
         <small style="font-size: 0.8em"><b>Note:</b> Threshold Temp is the temp the cleaning script runs once the bed temperature is lower while the bed cleaning temperature is the temperature the bed is set to. Default for this is 0 (Bed Off)</small>
     </p>
+
+<h5>Bed Clearing G-Code Instructions</h5>
+
 	<div class="control-group">
         <label class="control-label">Bed cleaning script</label>
         <div class="controls">
@@ -51,39 +50,8 @@
             <textarea rows="8" class="input-block-level" data-bind="value: settings.plugins.continuousprint.cp_queue_finished_script"></textarea>
         </div>
     </div>
-
-  <fieldset>
-    <legend>Restart on Pause</legend>
-    <p>
-      Print failure detection automation (such as <a target="_blank" href="https://www.thespaghettidetective.com/">Spaghetti Detective</a>) may auto-pause
-      a print if it detects a potential failure. Enable this feature to auto-retry the current queued print when Octoprint moves to a <code>PAUSED</code> state.
-    </p>
-    <div class="control-group">
-      <label class="control-label">Enable restart on pause</label>
-      <div class="controls">
-        <label class="checkbox">
-          <input type="checkbox" data-bind="checked: settings.plugins.continuousprint.cp_restart_on_pause_enabled"/>
-            Repeat current queued print when state is <code>PAUSED</code>
-        </label>
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label">Do nothing if printing &gt;</label>
-      <div class="controls">
-        <div class="input-append">
-          <input type="number" step="any" min="0" class="input-mini text-right" data-bind="value: settings.plugins.continuousprint.cp_restart_on_pause_max_seconds"/>
-          <span class="add-on">s</span>
-        </div>
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label">Give up after</label>
-      <div class="controls">
-        <div class="input-append">
-          <input type="number" step="any" min="0" class="input-mini text-right" data-bind="value: settings.plugins.continuousprint.cp_restart_on_pause_max_restarts"/>
-          <span class="add-on">restarts</span>
-        </div>
-      </div>
-    </div>
-  </fieldset>
+    	<p>
+		There is a special [PAUSE] command that doesn't get sent to the printer but instead indefinitely pauses the queue until the resume button is pressed.<br />
+		<small style="font-size: 0.8em"><b>Note:</b> this doesn't put the printer into a paused state it simply tells the queue to wait.</small>
+	</p>
 </form>
