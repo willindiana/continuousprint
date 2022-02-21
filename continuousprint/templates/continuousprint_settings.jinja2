@@ -6,8 +6,10 @@
 
 	<h5>Bed Cooldown Settings</h5>
     <p>
-        If enabled, when print in queue is finished bed will be set to 0.
-        After the <b>Bed Clearing Threshold</b> is met or timeout is exceeded the Bed clearing routine will continue.
+        If enabled, when print in queue is finished OctoPrint will run <b>Bed Cooldown Script</b>,
+        turn the heated bed off and monitor the bed temperature.
+        After either the <b>Bed Cooldown Threshold</b> or <b>Bed Cooldown Timeout</b> is
+        met the Bed clearing routine will continue.
     </p>
 
     <div class="control-group">
@@ -17,14 +19,21 @@
         </div>
     </div>
 
+    <div class="control-group">
+        <label class="control-label">Bed Cooldown Script</label>
+        <div class="controls">
+            <textarea rows="8" class="input-block-level" data-bind="value: settings.plugins.continuousprint.cp_bed_cooldown_script"></textarea>
+        </div>
+    </div>
+
 	<div class="control-group">
-        <label class="control-label">Bed Clearing Threshold</label>
+        <label class="control-label">Bed Cooldown Threshold</label>
         <div class="controls">
             <textarea rows="1" class="temperature-input" data-bind="value: settings.plugins.continuousprint.bed_cooldown_threshold"></textarea>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">Bed Clearing Timeout (Minutes)</label>
+        <label class="control-label">Bed Cooldown Timeout (Minutes)</label>
         <div class="controls">
             <textarea rows="1" class="temperature-input" data-bind="value: settings.plugins.continuousprint.bed_cooldown_timeout"></textarea>
         </div>

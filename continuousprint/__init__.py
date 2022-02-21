@@ -66,6 +66,7 @@ class ContinuousprintPlugin(
         d[RESTART_ON_PAUSE_KEY] = False
         d[RESTART_MAX_TIME_KEY] = 60 * 60
         d["bed_cooldown_enabled"] = False
+        d["cp_bed_cooldown_script"] = "; Put script to run before bed cools here\n"
         d["bed_cooldown_threshold"] = 30
         d["bed_cooldown_timeout"] = 60
         return d
@@ -134,6 +135,9 @@ class ContinuousprintPlugin(
         self._printer.cancel_print()
 
     def bed_cooldown(self):
+        self._logger.info("Running bed cooldown script")
+        bed_cooldown_script = self._settings.get(["cp_bed_cooldown_script"]).split("\n")
+        self._printer.commands(bed_cooldown_script, force=True)
         self._logger.info("Preparing for Bed Cooldown")
         self._printer.set_temperature("bed", 0)  # turn bed off
         timeout = time.time() + 60 * float(
